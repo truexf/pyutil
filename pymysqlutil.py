@@ -1,4 +1,4 @@
-import pretty
+import pyutil.pretty as pretty
 
 
 def select(conn, sql, *args):
@@ -10,8 +10,8 @@ def select(conn, sql, *args):
     :return: [{field_name1: field_value1, field_name2: field_value2},{...}]
     '''
     cur_data = conn.cursor()
-    defer = pretty.Defer(cur_data.close())
-    cur_data.execute(sql, *args)
+    defer = pretty.Defer(cur_data.close)
+    cur_data.execute(sql, args)
     data = cur_data.fetchall()
     key_list = []
     desc = cur_data.description
@@ -33,8 +33,8 @@ def execute(conn, sql, *args, commit=False):
     :return: effected records count
     '''
     cur = conn.cursor()
-    defer = pretty.Defer(cur.close())
-    ret = cur.execute(sql, *args)
+    defer = pretty.Defer(cur.close)
+    ret = cur.execute(sql, args)
     if commit:
         conn.commit()
     return ret
@@ -50,7 +50,7 @@ def execute_many(conn, sql, *args, commit=False):
     :return: effected records count
     '''
     cur = conn.cursor()
-    defer = pretty.Defer(cur.close())
+    defer = pretty.Defer(cur.close)
     ret = cur.executemany(sql, *args)
     if commit:
         conn.commit()

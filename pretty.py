@@ -3,6 +3,7 @@ import json
 import socket
 
 import psutil
+from sanic.request import Request
 
 
 class Defer:
@@ -125,17 +126,23 @@ host_name = socket.gethostname()
 user_name = getpass.getuser()
 ipv4s = local_ip_v4()
 ipv6s = local_ip_v6()
-log_number = 0
+log_number = {}
 
 
 def set_log_number(i):
     global log_number
-    log_number = i
+    log_number[i] = 1
     return
 
 
-def get_log_number():
-    return log_number
+def unset_log_number(i):
+    global log_number
+    log_number.pop(i)
+    return
+
+
+def get_log_number(num):
+    return num in log_number
 
 
 def split_by_line(s):
@@ -336,3 +343,20 @@ def object_dump_json(obj, indent=4):
 
     ret = "{%s}" % ret
     return ret
+
+
+def remote_ip(request: Request):
+    for k, v in request.headers.items():
+        if k.lower() == "x-real-ip":
+            return str(v)
+    for k, v in request.headers.items():
+        if k.lower() == "x-forwarded-for":
+            return str(v)
+    return request.ip
+
+
+def user_agent(request: Request):
+    for k, v in request.headers.items():
+        if k.lower() == "user-agent":
+            return str(v)
+    return ""
